@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Shopping Cart | Knockout Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-bind="css: cssDarkLight">
+
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">My Knockout Store</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <form class="navbar-form navbar-left">
+                            <label><input type="button" class="btn btn-default"
+                                    data-bind="value: txtDarkLight, click: clickDarkLight"></label>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 main">
+
+                <div class="box products">
+                    <h6 class="box-header">Products</h6>
+                    <div class="box-content">
+
+                        <table class="table">
+                            <thead>
+                                <th>Product</th>
+                                <th></th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Remove</th>
+                            </thead>
+                            <tbody data-bind="foreach: cartProductList">
+                                <tr class="product">
+                                    <td><img data-bind="attr: {src: 'img/' + image}"></td>
+                                    <td>
+                                        <span class="name" data-bind="text: name"></span>
+                                        <span class="category">Category: <span data-bind="text: category"></span></span>
+                                    </td>
+                                    <td class="price" data-bind="text: finalPrice"></td>
+                                    <td class="qty" data-bind="text: $data.qty"></td>
+                                    <td class="remove"><span class="glyphicon glyphicon-trash" aria-hidden="true"
+                                            data-bind="click: $root.removeFromCart.bind($data)"></span></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <div class="empty" data-bind="ifnot: cartProductList().length">You have no products in your cart yet</div>
+
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-default" data-bind="click: cleanCart">Clean
+                                cart</button>
+                            <button type="button" class="btn btn-default">Save list</button>
+                            <button type="button" class="btn btn-default alternative">Keep buying</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="box">
+                    <div class="row">
+
+                        <div class="col-md-7 shipping-address">
+                            <h6 class="box-header">Shipping Address</h6>
+                            <div class="box-content">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Street Address" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="City" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="State/Province" />
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Country    " />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 shipping-methods">
+                            <h6 class="box-header">Shipping Methods</h6>
+                            <div class="box-content">
+                                <div class="radio">
+                                    <label><input type="radio" name="shipping-method" value="7"
+                                            data-bind="checked: optShippingMethod, enable: cartProductList().length">
+                                        Express $7.00</label>
+                                </div>
+                                <div class="radio">
+                                    <label><input type="radio" name="shipping-method" value="5"
+                                            data-bind="checked: optShippingMethod, enable: cartProductList().length">
+                                        Scheduled $5.00</label>
+                                </div>
+                                <div class="radio">
+                                    <label><input type="radio" name="shipping-method" value="0"
+                                            data-bind="checked: optShippingMethod, enable: cartProductList().length"> In
+                                        Store Pick-Up $0.00</label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="box order-instructions">
+                    <h6 class="box-header">Instruction for Seller</h6>
+                    <div class="box-content">
+                        <textarea name="instructions" id="instructions" rows="3" class="form-control"
+                            placeholder="If you have some information for the seller you can leave them in the box below"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 side">
+                <div class="box order-summary">
+                    <h6 class="box-header">Order Summary</h6>
+                    <div class="box-content">
+                        <span class="box-legend">Shipping and additional costs are calculated based on values you have
+                            entered.</span>
+                        <p class="summary-item">
+                            <span class="description">Order Subtotal</span>
+                            <span class="value" data-bind="text: maskedSubtotal"></span>
+                        </p>
+                        <p class="summary-item">
+                            <span class="description">Shipping</span>
+                            <span class="value" data-bind="text: maskedShippingPrice"></span>
+                        </p>
+                        <p class="summary-item">
+                            <span class="description">
+                                Coupon Code
+                                <!-- ko if: usedCoupon -->
+                                <span data-bind="text: '(' + usedCoupon().name + ')'"></span>
+                                <!-- /ko -->
+                            </span>
+                            <span class="value" data-bind="text: $root.maskedCouponDiscount"></span>
+                        </p>
+
+                        <p class="summary-item total">
+                            <span class="description">Total</span>
+                            <span class="value" data-bind="text: total"></span>
+                        </p>
+
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-default">Checkout</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h6 class="box-header">Coupon Code</h6>
+                    <div class="box-content">
+                        <div class="coupon">
+                            <input type="text" class="form-control coupon-code" placeholder="Enter coupon code"
+                                data-bind="textInput: inputCoupon" />
+                            <button type="button" class="btn btn-default"
+                                data-bind="click: tryCoupon, enable: inputCoupon"><span class="glyphicon glyphicon-gift"
+                                    aria-hidden="true"></span> Apply coupon</button>
+                        </div>
+                        <div class="examples" data-bind="ifnot: inputCoupon">Examples: XMAS21, DISCOUNT20, BIGLIDIO
+                        </div>
+                        <div class="coupon-error" data-bind="text: couponError"></div>
+                    </div>
+                </div>
+
+                <div class="box recommended-offers">
+                    <h6 class="box-header">Recommended Offers</h6>
+                    <div class="box-content">
+                        <div class="recommended-products" data-bind="foreach: recommendedList">
+                            <div class="row recommended-product">
+                                <div class="col-xs-4 product-image">
+                                    <img data-bind="attr: {src: 'img/' + image}">
+                                </div>
+                                <div class="col-md-8 product-details">
+                                    <span class="name" data-bind="text: name"></span>
+                                    <span class="price" data-bind="text: finalPrice"></span> | <span class="addtocart"
+                                        data-bind="click: $root.addToCart.bind($data)">Add to cart</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.1.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+</body>
+
+</html>
